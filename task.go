@@ -51,27 +51,93 @@ type Task struct {
 }
 
 type TaskDates struct {
-	Type           *string `json:"type"`
-	Duration       *int    `json:"duration"`
-	Start          *string `json:"start"`
-	Due            *string `json:"due"`
-	WorkOnWeekends *bool   `json:"workOnWeekends"`
+	Type           *string `json:"type,omitempty"`
+	Duration       *int    `json:"duration,omitempty"`
+	Start          *string `json:"start,omitempty"`
+	Due            *string `json:"due,omitempty"`
+	WorkOnWeekends *bool   `json:"workOnWeekends,omitempty"`
 }
 
 type TaskMetadata struct {
-	Key   *string `json:"key"`
-	Value *string `json:"value"`
+	Key   *string `json:"key,omitempty"`
+	Value *string `json:"value,omitempty"`
 }
 
 type TaskCustomField struct {
-	ID    *string `json:"id"`
-	Value *string `json:"value"`
+	ID    *string `json:"id,omitempty"`
+	Value *string `json:"value,omitempty"`
 }
 
 type TaskEffort struct {
-	Mode            *string `json:"mode"`
-	TotalEffort     *int    `json:"totalEffort"`
-	AllocatedEffort *int    `json:"allocatedEffort"`
+	Mode            *string `json:"mode,omitempty"`
+	TotalEffort     *int    `json:"totalEffort,omitempty"`
+	AllocatedEffort *int    `json:"allocatedEffort,omitempty"`
+}
+
+type CreateTaskRequest struct {
+	FolderID *string
+	Payload  *CreateTaskPayload
+}
+
+type CreateTaskResponse struct {
+	Kind *string `json:"kind"`
+	Data []Task  `json:"data"`
+}
+
+type CreateTaskPayload struct {
+	Title            *string           `json:"title,omitempty"`
+	Description      *string           `json:"description,omitempty"`
+	Status           *string           `json:"status,omitempty"`
+	Importance       *string           `json:"importance,omitempty"`
+	Dates            *TaskDates        `json:"dates,omitempty"`
+	Shareds          []string          `json:"shareds,omitempty"`
+	Parents          []string          `json:"parents,omitempty"`
+	Responsibles     []string          `json:"responsibles,omitempty"`
+	Followers        []string          `json:"followers,omitempty"`
+	Follow           *bool             `json:"follow,omitempty"`
+	PriorityBefore   *string           `json:"priorityBefore,omitempty"`
+	PriorityAfter    *string           `json:"priorityAfter,omitempty"`
+	SuperTasks       []string          `json:"superTasks,omitempty"`
+	Metadata         []TaskMetadata    `json:"metadata,omitempty"`
+	CustomFields     []TaskCustomField `json:"customFields,omitempty"`
+	CustomStatus     *string           `json:"customStatus,omitempty"`
+	EffortAllocation *TaskEffort       `json:"effortAllocation,omitempty"`
+}
+
+type UpdateTaskRequest struct {
+	TaskID  *string
+	Payload *UpdateTaskPayload
+}
+
+type UpdateTaskResponse struct {
+	Kind *string `json:"kind"`
+	Data []Task  `json:"data"`
+}
+
+type UpdateTaskPayload struct {
+	Title              *string           `json:"title,omitempty"`
+	Description        *string           `json:"description,omitempty"`
+	Status             *string           `json:"status,omitempty"`
+	Importance         *string           `json:"importance,omitempty"`
+	Dates              *TaskDates        `json:"dates,omitempty"`
+	AddParents         []string          `json:"addParents,omitempty"`
+	RemoveParents      []string          `json:"removeParents,omitempty"`
+	AddShareds         []string          `json:"addShareds,omitempty"`
+	RemoveShareds      []string          `json:"removeShareds,omitempty"`
+	AddResponsibles    []string          `json:"addResponsibles,omitempty"`
+	RemoveResponsibles []string          `json:"removeResponsibles,omitempty"`
+	AddFollowers       []string          `json:"addFollowers,omitempty"`
+	RemoveFollowers    []string          `json:"removeFollowers,omitempty"`
+	Follow             *bool             `json:"follow,omitempty"`
+	PriorityBefore     *string           `json:"priorityBefore,omitempty"`
+	PriorityAfter      *string           `json:"priorityAfter,omitempty"`
+	AddSuperTasks      []string          `json:"addSuperTasks,omitempty"`
+	RemoveSuperTasks   []string          `json:"removeSuperTasks,omitempty"`
+	Metadata           []TaskMetadata    `json:"metadata,omitempty"`
+	CustomFields       []TaskCustomField `json:"customFields,omitempty"`
+	CustomStatus       *string           `json:"customStatus,omitempty"`
+	Restore            *bool             `json:"restore,omitempty"`
+	EffortAllocation   *TaskEffort       `json:"effortAllocation,omitempty"`
 }
 
 func (client *Client) GetTasks(req *GetTasksRequest) (*GetTasksResponse, error) {
@@ -82,6 +148,56 @@ func (client *Client) GetTasks(req *GetTasksRequest) (*GetTasksResponse, error) 
 	)
 
 	err := client.requestGet(path, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
+func (client *Client) CreateTask(req *CreateTaskRequest) (*CreateTaskResponse, error) {
+	var res CreateTaskResponse
+
+	if req.FolderID == nil {
+		return nil, fmt.Errorf("FolderID is required to request the CreateTask API")
+	}
+	folderID := StringValue(req.FolderID)
+
+	if req.Payload == nil {
+		return nil, fmt.Errorf("Payload is required to request the CreateTask API")
+	}
+	payload := *req.Payload
+
+	path := fmt.Sprintf("/folders/%s/tasks",
+		url.PathEscape(folderID),
+	)
+
+	err := client.requestPost(path, &payload, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
+func (client *Client) UpdateTask(req *UpdateTaskRequest) (*UpdateTaskResponse, error) {
+	var res UpdateTaskResponse
+
+	if req.TaskID == nil {
+		return nil, fmt.Errorf("TaskID is required to request the UpdateTask API")
+	}
+	taskID := StringValue(req.TaskID)
+
+	if req.Payload == nil {
+		return nil, fmt.Errorf("Payload is required to request the UpdateTask API")
+	}
+	payload := *req.Payload
+
+	path := fmt.Sprintf("/tasks/%s",
+		url.PathEscape(taskID),
+	)
+
+	err := client.requestPut(path, &payload, &res)
 	if err != nil {
 		return nil, err
 	}

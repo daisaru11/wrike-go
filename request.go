@@ -33,6 +33,46 @@ func (client *Client) requestGet(path string, result interface{}) error {
 	return nil
 }
 
+func (client *Client) requestPost(path string, request, result interface{}) error {
+	httpReq, err := client.createHTTPRequest("POST", path, request)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("Failed to build HTTP Request: %s", path))
+	}
+
+	resp, err := client.httpClient.Do(httpReq)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("Failure on POST request: %s", path))
+	}
+	defer resp.Body.Close()
+
+	err = client.handleHTTPResponse(resp, result)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("Failed to handle resonse: %s", path))
+	}
+
+	return nil
+}
+
+func (client *Client) requestPut(path string, request, result interface{}) error {
+	httpReq, err := client.createHTTPRequest("PUT", path, request)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("Failed to build HTTP Request: %s", path))
+	}
+
+	resp, err := client.httpClient.Do(httpReq)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("Failure on PUT request: %s", path))
+	}
+	defer resp.Body.Close()
+
+	err = client.handleHTTPResponse(resp, result)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("Failed to handle resonse: %s", path))
+	}
+
+	return nil
+}
+
 func (client *Client) createHTTPRequest(method, path string, body interface{}) (*http.Request, error) {
 	var bodyReader io.Reader
 
