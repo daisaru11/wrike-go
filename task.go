@@ -140,6 +140,15 @@ type UpdateTaskPayload struct {
 	EffortAllocation   *TaskEffort       `json:"effortAllocation,omitempty"`
 }
 
+type DeleteTaskRequest struct {
+	TaskID *string
+}
+
+type DeleteTaskResponse struct {
+	Kind *string `json:"kind"`
+	Data []Task  `json:"data"`
+}
+
 func (client *Client) GetTasks(req *GetTasksRequest) (*GetTasksResponse, error) {
 	var res GetTasksResponse
 
@@ -198,6 +207,26 @@ func (client *Client) UpdateTask(req *UpdateTaskRequest) (*UpdateTaskResponse, e
 	)
 
 	err := client.requestPut(path, &payload, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
+func (client *Client) DeleteTask(req *DeleteTaskRequest) (*DeleteTaskResponse, error) {
+	var res DeleteTaskResponse
+
+	if req.TaskID == nil {
+		return nil, fmt.Errorf("TaskID is required to request the DeleteTask API")
+	}
+	taskID := StringValue(req.TaskID)
+
+	path := fmt.Sprintf("/tasks/%s",
+		url.PathEscape(taskID),
+	)
+
+	err := client.requestDelete(path, nil, &res)
 	if err != nil {
 		return nil, err
 	}
