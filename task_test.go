@@ -207,17 +207,17 @@ func TestGetTasksResponseJsonUnmarshal(t *testing.T) {
 		assert.Equal(t, []string{"IEABRDPJKQAQOJ3R"}, res.Data[0].SubTaskIDs)
 		assert.Equal(t, []string{"IEABRDPJIUAQOJ3PKMAQOJ3R", "IEABRDPJIUAQOJ3TKMAQOJ3P"}, res.Data[0].DependencyIDs)
 		assert.Equal(t, []TaskMetadata{
-			TaskMetadata{
+			{
 				Key:   String("testMetaKey"),
 				Value: String("testMetaValue"),
 			},
 		}, res.Data[0].Metadata)
 		assert.Equal(t, []TaskCustomField{
-			TaskCustomField{
+			{
 				ID:    String("IEABRDPJJUAAMVQM"),
 				Value: String("testValue"),
 			},
-			TaskCustomField{
+			{
 				ID:    String("IEABRDPJJUAAMVQN"),
 				Value: String("testValue"),
 			},
@@ -254,17 +254,17 @@ func TestGetTasksResponseJsonUnmarshal(t *testing.T) {
 		assert.Equal(t, []string{}, res.Data[1].SubTaskIDs)
 		assert.Equal(t, []string{"IEABRDPJIUAQOJ3TKMAQOJ3P"}, res.Data[1].DependencyIDs)
 		assert.Equal(t, []TaskMetadata{
-			TaskMetadata{
+			{
 				Key:   String("testMetaKey"),
 				Value: String("testMetaValue"),
 			},
 		}, res.Data[1].Metadata)
 		assert.Equal(t, []TaskCustomField{
-			TaskCustomField{
+			{
 				ID:    String("IEABRDPJJUAAMVQN"),
 				Value: String("testValue"),
 			},
-			TaskCustomField{
+			{
 				ID:    String("IEABRDPJJUAAMVQM"),
 				Value: String("testValue"),
 			},

@@ -81,6 +81,7 @@ func (client *Client) requestDelete(path string, request, result interface{}) er
 
 	resp, err := client.httpClient.Do(httpReq)
 	if err != nil {
+		//nolint:gosec
 		return errors.Wrap(err, fmt.Sprintf("Failure on DELETE request: %s", path))
 	}
 	defer resp.Body.Close()
